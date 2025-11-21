@@ -1,9 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import React from 'react'
-import { Slot, useRouter } from 'expo-router'
+import { Slot } from 'expo-router'
 
 const AppLayout = () => {
-  const router = useRouter();
 
   return (
     <View style={styles.appContainer}>
