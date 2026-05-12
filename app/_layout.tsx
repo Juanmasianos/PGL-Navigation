@@ -1,22 +1,23 @@
-import { StyleSheet, View } from 'react-native'
 import React from 'react'
 import { Drawer } from 'expo-router/drawer'
 
-const AppLayout = () => {
+export default function AppLayout() {
   return (
-    <View style={styles.appContainer}>
-      <Drawer initialRouteName="index">
-        <Drawer.Screen name="index" options={{ title: 'Bienvenida' }} />
-        <Drawer.Screen name="portfolio" options={{ title: 'Portfolio' }} />
-      </Drawer>
-    </View>
+    <Drawer>
+      <Drawer.Screen
+        name="bienvenida" 
+        options={{
+          drawerLabel: 'Bienvenida',
+          title: 'Bienvenida',
+        }}
+      />
+      <Drawer.Screen
+        name="portfolio" 
+        options={{
+          drawerLabel: 'Portfolio',
+          title: 'Portfolio',
+        }}
+      />
+    </Drawer>
   )
 }
-
-export default AppLayout
-
-const styles = StyleSheet.create({
-  appContainer: {
-    flex: 1,
-  },
-})

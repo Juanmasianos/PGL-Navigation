@@ -3,7 +3,7 @@ import Hobby from '../components/Hobby';
 
 export const styles = StyleSheet.create({
     container: {
-        marginTop: 50,
+        marginTop: 20,
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
