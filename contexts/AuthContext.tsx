@@ -51,58 +51,108 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (email: string, pswd: string) => {
+  const login = async (mail: string, pswd: string) => {
     try {
       const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.LOGIN}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, pswd }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ "email": mail, "pswd": pswd }),
       });
 
+      // Manejo de errores según image_e78b59.png
+      if (response.status === 400) {
+        throw new Error('Petición no válida o cuerpo ausente.');
+      }
+      if (response.status === 401) {
+        throw new Error('Email o contraseña incorrectos.');
+      }
       if (!response.ok) {
-        throw new Error('Login failed');
+        throw new Error('Error inesperado en el inicio de sesión.');
       }
 
       const data = await response.json();
-      const { token: newToken, user: userData } = data;
+      const { userId: userId, email: email, token: token } = data.object;
 
-      await storage.setItem('token', newToken);
-      await storage.setItem('user', JSON.stringify(userData));
-
-      setToken(newToken);
-      setUser(userData);
+      await storage.setItem('token', token);
+      await storage.setItem('user', JSON.stringify({ id: userId, email, name: '' }));
+      setToken(token);
+      setUser({ id: userId, email, name: '' });
     } catch (error) {
       console.error('Login error:', error);
-      throw error;
+      throw error; // Re-lanzamos para que la UI lo capture
     }
   };
 
   const register = async (fullname: string, email: string, pswd: string) => {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REGISTER}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fullname, email, pswd }),
-      });
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REGISTER}`,
+        {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fullname,
+            email,
+            pswd
+          })
+        });
 
+      // Manejo de errores según image_e78b59.png
+      if (response.status === 400) {
+        throw new Error('Datos de registro incompletos o inválidos.');
+      }
+      if (response.status === 409) {
+        throw new Error('El email ya está registrado.');
+      }
       if (!response.ok) {
-        throw new Error('Registration failed');
+        throw new Error('Error al intentar registrar el usuario.');
       }
 
       const data = await response.json();
+      console.log("Respuesta del servidor:", data);
       const { token: newToken, user: userData } = data;
 
       await storage.setItem('token', newToken);
       await storage.setItem('user', JSON.stringify(userData));
-
       setToken(newToken);
       setUser(userData);
     } catch (error) {
       console.error('Registration error:', error);
+      throw error;
+    }
+  };
+
+  const getWelcomeMessage = async (): Promise<string> => {
+    try {
+      if (!token) throw new Error('No hay sesión activa.');
+
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.WELCOME}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      // Manejo de errores según image_e78e05.png
+      if (response.status === 401) {
+        // El token ha expirado o no es válido
+        await logout(); // Cerramos sesión automáticamente por seguridad
+        throw new Error('Sesión expirada o token no encontrado.');
+      }
+
+      if (!response.ok) {
+        throw new Error('No se pudo obtener el mensaje de bienvenida.');
+      }
+
+      const data = await response.json();
+      const message = data.message || data.msg || 'Bienvenido';
+      setWelcomeMessage(message);
+      return message;
+    } catch (error) {
+      console.error('Welcome message error:', error);
       throw error;
     }
   };
@@ -116,34 +166,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setWelcomeMessage(null);
     } catch (error) {
       console.error('Logout error:', error);
-    }
-  };
-
-  const getWelcomeMessage = async (): Promise<string> => {
-    try {
-      if (!token) {
-        throw new Error('No token available');
-      }
-
-      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.WELCOME}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get welcome message');
-      }
-
-      const data = await response.json();
-      const message = data.message || data.msg || 'Bienvenido';
-      setWelcomeMessage(message);
-      return message;
-    } catch (error) {
-      console.error('Welcome message error:', error);
-      throw error;
     }
   };
 

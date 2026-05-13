@@ -51,7 +51,7 @@ export default function RegisterScreen() {
   };
 
   const goToLogin = () => {
-    router.push('/(auth)/login' as any);
+    router.push('/(auth)/login');
   };
 
   return (

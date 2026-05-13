@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Drawer } from 'expo-router/drawer';
+import { useRouter, useSegments } from 'expo-router';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import LoadingScreen from '../components/LoadingScreen';
-import { useRouter, useSegments } from 'expo-router';
 
 function AppContent() {
   const { user, isLoading } = useAuth();
@@ -25,50 +25,41 @@ function AppContent() {
     return <LoadingScreen />;
   }
 
-  if (!user) {
-    // Usuario no autenticado, mostrar solo las pantallas de auth
-    return (
-      <Drawer screenOptions={{ headerShown: false }}>
-        <Drawer.Screen
-          name="(auth)/login"
-          options={{
-            drawerLabel: 'Iniciar Sesión',
-            title: 'Login',
-          }}
-        />
-        <Drawer.Screen
-          name="(auth)/register"
-          options={{
-            drawerLabel: 'Registro',
-            title: 'Registro',
-          }}
-        />
-      </Drawer>
-    );
-  }
-
-  // Usuario autenticado, mostrar la app completa
   return (
-    <Drawer>
+    <Drawer screenOptions={{ headerShown: !!user }}>
+      <Drawer.Screen
+        name="(auth)/login"
+        options={{
+          title: 'Login',
+          drawerItemStyle: user ? { display: 'none' } : {} 
+        }}
+      />
+      <Drawer.Screen
+        name="(auth)/register"
+        options={{
+          title: 'Registro',
+          drawerItemStyle: user ? { display: 'none' } : {}
+        }}
+      />
       <Drawer.Screen
         name="bienvenida"
         options={{
-          drawerLabel: 'Bienvenida',
-          title: 'Bienvenida',
+          title: 'Inicio',
+          drawerItemStyle: !user ? { display: 'none' } : {} 
         }}
       />
       <Drawer.Screen
         name="portfolio"
         options={{
-          drawerLabel: 'Portfolio',
           title: 'Portfolio',
+          drawerItemStyle: !user ? { display: 'none' } : {}
         }}
       />
       <Drawer.Screen
-        name="lista"
+        name="Lista"
         options={{
-          drawerLabel: 'Lista',
           title: 'Lista',
+          drawerItemStyle: !user ? { display: 'none' } : {}
         }}
       />
     </Drawer>
