@@ -98,6 +98,22 @@ o
 - ✅ Logout funcional
 - ✅ Validación de formularios
 
+## Problemas resueltos
+
+### Error "Native module is null" en AsyncStorage
+- **Problema**: AsyncStorage no funcionaba en entorno web/simulador, causando error "Native module is null"
+- **Solución**: Implementada abstracción de storage en `utils/storage.ts` que detecta la plataforma automáticamente:
+  - Web: usa `localStorage`
+  - Móvil: usa `AsyncStorage`
+- **Resultado**: Compatibilidad completa entre plataformas sin errores
+
+### Campos de API corregidos
+- **Problema**: Campos de API no coincidían con especificaciones del profesor
+- **Solución**: Actualizados todos los campos según documentación:
+  - `name` → `fullname`
+  - `password` → `pswd`
+- **Resultado**: API calls compatibles con backend del profesor
+
 ## Flujo de autenticación
 
 1. Al abrir la app, se verifica si hay un token almacenado
@@ -109,4 +125,5 @@ o
 
 ## Dependencias agregadas
 
-- `@react-native-async-storage/async-storage`: Para almacenar el token JWT localmente
+- `@react-native-async-storage/async-storage`: Para almacenar el token JWT localmente (solo móvil)
+- **Storage abstraction**: Implementación personalizada que funciona tanto en móvil como en web usando localStorage para web y AsyncStorage para móvil

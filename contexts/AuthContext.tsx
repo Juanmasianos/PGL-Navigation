@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { storage } from '../utils/storage';
 import { API_CONFIG } from '../config/api';
 
 interface User {
@@ -37,8 +37,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAuthState = async () => {
     try {
-      const storedToken = await AsyncStorage.getItem('token');
-      const storedUser = await AsyncStorage.getItem('user');
+      const storedToken = await storage.getItem('token');
+      const storedUser = await storage.getItem('user');
 
       if (storedToken && storedUser) {
         setToken(storedToken);
@@ -68,8 +68,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = await response.json();
       const { token: newToken, user: userData } = data;
 
-      await AsyncStorage.setItem('token', newToken);
-      await AsyncStorage.setItem('user', JSON.stringify(userData));
+      await storage.setItem('token', newToken);
+      await storage.setItem('user', JSON.stringify(userData));
 
       setToken(newToken);
       setUser(userData);
@@ -96,8 +96,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = await response.json();
       const { token: newToken, user: userData } = data;
 
-      await AsyncStorage.setItem('token', newToken);
-      await AsyncStorage.setItem('user', JSON.stringify(userData));
+      await storage.setItem('token', newToken);
+      await storage.setItem('user', JSON.stringify(userData));
 
       setToken(newToken);
       setUser(userData);
@@ -109,8 +109,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem('token');
-      await AsyncStorage.removeItem('user');
+      await storage.removeItem('token');
+      await storage.removeItem('user');
       setToken(null);
       setUser(null);
       setWelcomeMessage(null);
