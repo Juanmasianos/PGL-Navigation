@@ -20,7 +20,6 @@ const WelcomeScreen = () => {
       const message = await getWelcomeMessage()
       setDisplayMessage(message)
     } catch (error) {
-      console.error('Error fetching welcome message:', error)
       setDisplayMessage('Bienvenido')
     } finally {
       setIsLoading(false)

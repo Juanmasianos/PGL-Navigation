@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { storage } from '../utils/storage';
 import { API_CONFIG } from '../config/api';
+import { Alert } from 'react-native';
 
 interface User {
   id: string;
@@ -101,7 +102,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Manejo de errores según image_e78b59.png
       if (response.status === 400) {
-        throw new Error('Datos de registro incompletos o inválidos.');
+        Alert.alert('Datos de registro incompletos o inválidos.');
       }
       if (response.status === 409) {
         throw new Error('El email ya está registrado.');
@@ -112,11 +113,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const data = await response.json();
       console.log("Respuesta del servidor:", data);
-      const { token: newToken, user: userData } = data;
+      const { token: newToken, object: userData } = data;
 
-      await storage.setItem('token', newToken);
       await storage.setItem('user', JSON.stringify(userData));
-      setToken(newToken);
       setUser(userData);
     } catch (error) {
       console.error('Registration error:', error);
@@ -135,20 +134,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           'Authorization': `Bearer ${token}`,
         },
       });
-
+      console.log('Welcome message:', response);
       // Manejo de errores según image_e78e05.png
       if (response.status === 401) {
         // El token ha expirado o no es válido
         await logout(); // Cerramos sesión automáticamente por seguridad
-        throw new Error('Sesión expirada o token no encontrado.');
+        Alert.alert('Sesión expirada o token no encontrado.');
       }
 
       if (!response.ok) {
-        throw new Error('No se pudo obtener el mensaje de bienvenida.');
+        Alert.alert('No se pudo obtener el mensaje de bienvenida.');
       }
 
       const data = await response.json();
-      const message = data.message || data.msg || 'Bienvenido';
+      console.log('Welcome message data:', data);
+      const message = data.object || data.msg || 'Bienvenido';
       setWelcomeMessage(message);
       return message;
     } catch (error) {

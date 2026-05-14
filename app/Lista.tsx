@@ -50,6 +50,9 @@ export default function App() {
         onClose={() => setModalVisible(false)}
         onAgregar={handleAgregarVideojuego}
       />
+      <View>
+        <Text>{videojuegos.length} videojuegos</Text>
+      </View>
       <FlatList
         style={styles.listContainer}
         data={videojuegos}

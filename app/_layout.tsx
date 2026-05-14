@@ -15,9 +15,9 @@ function AppContent() {
     const inAuthGroup = segments[0] === '(auth)';
 
     if (user && inAuthGroup) {
-      router.replace('/bienvenida' as any);
+      router.replace('/bienvenida');
     } else if (!user && !inAuthGroup) {
-      router.replace('/(auth)/login' as any);
+      router.replace('/(auth)/login');
     }
   }, [user, segments, isLoading]);
 
